@@ -1,12 +1,14 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import OperationsFile
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
 
-def is_admin(user):
-    return user.is_superuser
-
-@login_required
-@user_passes_test(is_admin)
-def admin_dashboard(request):
-    files = OperationsFile.objects.all().order_by('-last_updated')
-    return render(request, 'dashboard/admin_dashboard.html', {'files': files})
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            return render(request, 'dashboard/login.html', {'error': 'Invalid credentials'})
+    return render(request, 'dashboard/login.html')

@@ -1,0 +1,1 @@
+web: gunicorn spectra_connect.wsgi
